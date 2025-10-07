@@ -88,9 +88,7 @@ PHP SaaS Template/
 │   │   └── style.css            # Main stylesheet
 │   ├── js/
 │   │   └── main.js              # JavaScript functionality
-│   └── images/
-│       ├── star.svg             # Star icon
-│       └── laurel.svg           # Laurel badge
+│   └── images/                  # Your image assets
 ├── database/
 │   ├── init.php                 # Database initialization
 │   ├── migrate_google_oauth.php # OAuth migration

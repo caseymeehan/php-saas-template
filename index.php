@@ -44,11 +44,9 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
                 <div class="nav-menu" id="navMenu">
                     <?php if ($isLoggedIn): ?>
                         <a href="dashboard/" class="nav-item">📊 Dashboard</a>
-                        <a href="pricing.php" class="nav-item">💰 Pricing</a>
                         <a href="auth/logout.php" class="nav-item">🚪 Log out</a>
                     <?php else: ?>
                         <a href="#features" class="nav-item">✨ Features</a>
-                        <a href="pricing.php" class="nav-item">💰 Pricing</a>
                         <a href="auth/google-login.php" class="nav-item nav-item-cta">👋 Sign in with Google</a>
                     <?php endif; ?>
                 </div>
@@ -58,55 +56,6 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
 
     <!-- Flash Messages -->
     <?php if (hasFlashMessages()): ?>
-        <style>
-            .flash-messages {
-                max-width: 1200px;
-                margin: 1rem auto;
-                padding: 0 2rem;
-            }
-            
-            .flash-message {
-                padding: 1rem 1.5rem;
-                border-radius: 8px;
-                margin-bottom: 1rem;
-                animation: slideIn 0.3s ease-out;
-            }
-            
-            @keyframes slideIn {
-                from {
-                    transform: translateY(-20px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateY(0);
-                    opacity: 1;
-                }
-            }
-            
-            .flash-message.success {
-                background: #d4edda;
-                color: #155724;
-                border: 1px solid #c3e6cb;
-            }
-            
-            .flash-message.error {
-                background: #f8d7da;
-                color: #721c24;
-                border: 1px solid #f5c6cb;
-            }
-            
-            .flash-message.warning {
-                background: #fff3cd;
-                color: #856404;
-                border: 1px solid #ffeaa7;
-            }
-            
-            .flash-message.info {
-                background: #d1ecf1;
-                color: #0c5460;
-                border: 1px solid #bee5eb;
-            }
-        </style>
         <div class="flash-messages">
             <?php foreach (getFlashMessages() as $flash): ?>
                 <div class="flash-message <?php echo escape($flash['type']); ?>">
@@ -130,13 +79,13 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
                     <!-- Key Benefits as Bullet Points -->
                     <div class="benefits">
                         <div class="benefit">
-                            ✅ <a href="/features.php">Take a screenshot</a> of your workflow and let AI optimize it in seconds
+                            ✅ Take a screenshot of your workflow and let AI optimize it in seconds
                         </div>
                         <div class="benefit">
-                            🎨 <a href="/features.php">Choose a solution style</a> from Modern, Minimalist to Enterprise
+                            🎨 Choose a solution style from Modern, Minimalist to Enterprise
                         </div>
                         <div class="benefit">
-                            ⚡️ <a href="/features.php">Transform your ideas</a> and sketches into production-ready features
+                            ⚡️ Transform your ideas and sketches into production-ready features
                         </div>
                     </div>
                 </div>
@@ -150,9 +99,6 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
                         
                         <div class="signup-form">
                             <a href="dashboard/" class="btn btn-cta">Go to Dashboard →</a>
-                            <a href="pricing.php" class="btn btn-google">
-                                💎 View Pricing Plans
-                            </a>
                         </div>
                     <?php else: ?>
                         <div class="signup-bubble">
@@ -228,41 +174,23 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>Product</h4>
+                    <h4><?php echo SITE_NAME; ?></h4>
                     <ul>
-                        <li><a href="/features.php">Features</a></li>
-                        <li><a href="/pricing.php">Pricing</a></li>
-                        <li><a href="/changelog.php">Changelog</a></li>
-                        <li><a href="/roadmap.php">Roadmap</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="/about.php">About</a></li>
-                        <li><a href="/blog.php">Blog</a></li>
-                        <li><a href="/careers.php">Careers</a></li>
-                        <li><a href="/contact.php">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="/docs.php">Documentation</a></li>
-                        <li><a href="/api.php">API Reference</a></li>
-                        <li><a href="/help.php">Help Center</a></li>
-                        <li><a href="/community.php">Community</a></li>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <?php if ($isLoggedIn): ?>
+                            <li><a href="/dashboard/">Dashboard</a></li>
+                        <?php else: ?>
+                            <li><a href="/auth/google-login.php">Sign In</a></li>
+                        <?php endif; ?>
                     </ul>
                 </div>
                 
                 <div class="footer-section">
                     <h4>Legal</h4>
                     <ul>
-                        <li><a href="/privacy.php">Privacy Policy</a></li>
-                        <li><a href="/terms.php">Terms of Service</a></li>
-                        <li><a href="/security.php">Security</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
                     </ul>
                 </div>
             </div>

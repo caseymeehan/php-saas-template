@@ -70,39 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(card);
     });
     
-    // Form validation helper (for future forms)
-    window.validateEmail = function(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
-    };
-    
-    // Toast notification system
-    window.showToast = function(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.textContent = message;
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
-            animation: slideInRight 0.3s ease;
-        `;
-        
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.animation = 'slideOutRight 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    };
-    
-    // Dark mode toggle (optional)
+    // Dark mode toggle (ready for future implementation)
+    // To enable: add a button with id="darkModeToggle" to your HTML
     const darkModeToggle = document.getElementById('darkModeToggle');
     if (darkModeToggle) {
         const currentTheme = localStorage.getItem('theme') || 'light';
@@ -117,72 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Initialize tooltips (if needed)
-    window.initTooltips = function() {
-        const tooltips = document.querySelectorAll('[data-tooltip]');
-        tooltips.forEach(elem => {
-            elem.addEventListener('mouseenter', function() {
-                const tooltip = document.createElement('div');
-                tooltip.className = 'tooltip';
-                tooltip.textContent = this.getAttribute('data-tooltip');
-                tooltip.style.cssText = `
-                    position: absolute;
-                    background: rgba(0,0,0,0.9);
-                    color: white;
-                    padding: 0.5rem;
-                    border-radius: 4px;
-                    font-size: 0.875rem;
-                    white-space: nowrap;
-                    z-index: 1000;
-                    pointer-events: none;
-                `;
-                document.body.appendChild(tooltip);
-                
-                const rect = this.getBoundingClientRect();
-                tooltip.style.top = (rect.top - tooltip.offsetHeight - 5) + 'px';
-                tooltip.style.left = (rect.left + (rect.width - tooltip.offsetWidth) / 2) + 'px';
-                
-                this._tooltip = tooltip;
-            });
-            
-            elem.addEventListener('mouseleave', function() {
-                if (this._tooltip) {
-                    this._tooltip.remove();
-                    this._tooltip = null;
-                }
-            });
-        });
-    };
-    
-    initTooltips();
-    
-    console.log('SaaS Template initialized successfully! 🚀');
+    console.log('🚀 SaaS Template initialized successfully!');
 });
-
-// Add animation keyframes dynamically
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
 

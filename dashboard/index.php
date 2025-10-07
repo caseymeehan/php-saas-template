@@ -31,6 +31,10 @@ $pageTitle = 'Dashboard';
     <title><?php echo $pageTitle . ' - ' . SITE_NAME; ?></title>
     <link rel="stylesheet" href="<?php echo url('assets/css/style.css'); ?>">
     <style>
+        body {
+            padding-top: 80px; /* Account for fixed header */
+        }
+        
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -131,42 +135,6 @@ $pageTitle = 'Dashboard';
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
         
-        .flash-messages {
-            max-width: 1200px;
-            margin: 0 auto 1rem auto;
-            padding: 0 2rem;
-        }
-        
-        .flash-message {
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-        
-        .flash-message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .flash-message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .flash-message.warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        
-        .flash-message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
         .header {
             background: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -192,7 +160,6 @@ $pageTitle = 'Dashboard';
             <nav class="nav">
                 <div class="nav-menu">
                     <a href="../dashboard/" class="nav-item">📊 Dashboard</a>
-                    <a href="../pricing.php" class="nav-item">💰 Pricing</a>
                     <a href="../auth/logout.php" class="nav-item">🚪 Log out</a>
                 </div>
             </nav>
@@ -258,9 +225,6 @@ $pageTitle = 'Dashboard';
         <div class="quick-actions">
             <h2>Quick Actions</h2>
             <div class="action-grid">
-                <a href="../pricing.php" class="action-button">
-                    💎 Upgrade Plan
-                </a>
                 <a href="../" class="action-button">
                     🏠 Back to Home
                 </a>
