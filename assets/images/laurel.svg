@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" fill="none" stroke="currentColor" stroke-width="2">
+  <!-- Left laurel branch -->
+  <path d="M 20 40 Q 30 20, 40 30 Q 35 35, 38 40 Q 35 45, 40 50 Q 30 60, 20 40 Z" fill="currentColor" opacity="0.8"/>
+  <path d="M 35 40 Q 45 25, 55 32 Q 50 37, 53 42 Q 50 47, 55 52 Q 45 63, 35 40 Z" fill="currentColor" opacity="0.8"/>
+  <path d="M 50 40 Q 60 28, 70 35 Q 65 40, 68 45 Q 65 50, 70 55 Q 60 65, 50 40 Z" fill="currentColor" opacity="0.8"/>
+  
+  <!-- Right laurel branch (mirrored) -->
+  <path d="M 180 40 Q 170 20, 160 30 Q 165 35, 162 40 Q 165 45, 160 50 Q 170 60, 180 40 Z" fill="currentColor" opacity="0.8"/>
+  <path d="M 165 40 Q 155 25, 145 32 Q 150 37, 147 42 Q 150 47, 145 52 Q 155 63, 165 40 Z" fill="currentColor" opacity="0.8"/>
+  <path d="M 150 40 Q 140 28, 130 35 Q 135 40, 132 45 Q 135 50, 130 55 Q 140 65, 150 40 Z" fill="currentColor" opacity="0.8"/>
+  
+  <!-- Bottom connecting ribbon -->
+  <ellipse cx="100" cy="65" rx="25" ry="8" fill="currentColor" opacity="0.6"/>
+  <path d="M 75 65 Q 75 68, 78 70 L 122 70 Q 125 68, 125 65" fill="none" stroke="currentColor" stroke-width="1.5"/>
+</svg>
+

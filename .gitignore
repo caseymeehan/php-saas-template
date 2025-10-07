@@ -1,0 +1,36 @@
+# Database
+*.db
+*.sqlite
+*.sqlite3
+database/*.db
+
+# Configuration files with sensitive data
+config.php
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Dependencies
+vendor/
+node_modules/
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
