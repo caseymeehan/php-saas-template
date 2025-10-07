@@ -1,36 +1,47 @@
+# Composer
+/vendor/
+composer.lock
+
 # Database
-*.db
-*.sqlite
-*.sqlite3
-database/*.db
+/database/saas.db
+/database/*.db
 
-# Configuration files with sensitive data
-config.php
+# Logs
+*.log
+error_log
+debug.log
 
-# OS files
+# OS Files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.project
+.settings/
 
-# Dependencies
-vendor/
-node_modules/
+# Uploaded Files
+/uploads/avatars/*
+!/uploads/avatars/.gitkeep
 
-# Logs
-*.log
+# Environment
+.env
+.env.local
+.env.production
 
-# Temporary files
+# Sensitive Configuration (if you split config)
+config.local.php
+
+# Cache
+cache/
+*.cache
+
+# Temporary Files
 tmp/
 temp/
 *.tmp

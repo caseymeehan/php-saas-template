@@ -6,13 +6,14 @@ A modern, simple, and powerful SaaS template built with PHP and SQLite. Inspired
 
 - **Modern Design**: Beautiful, responsive homepage with hero section
 - **Simple Stack**: Pure PHP with SQLite - no complex dependencies
-- **User Authentication**: Complete auth system (login, signup, password reset)
+- **Google OAuth Authentication**: One-click sign-in with Google (no passwords!)
+- **User Dashboard**: Personalized dashboard for authenticated users
 - **Database Ready**: SQLite database with proper schema
-- **Session Management**: Secure session handling
-- **Activity Logging**: Track user actions
-- **Subscription Ready**: Built-in subscription management tables
+- **Secure Session Management**: Database-backed session handling with token authentication
+- **Activity Logging**: Track user actions and events
+- **Subscription Ready**: Built-in subscription management tables for Stripe integration
 - **Responsive**: Mobile-first design that works on all devices
-- **Fast & Lightweight**: No bloated frameworks
+- **Fast & Lightweight**: Minimal dependencies, maximum performance
 
 ## Quick Start 🏁
 
@@ -20,54 +21,91 @@ A modern, simple, and powerful SaaS template built with PHP and SQLite. Inspired
 
 - PHP 7.4 or higher
 - SQLite3 extension enabled
+- Composer (for dependency management)
+- A Google Cloud account (for OAuth)
 - A web server (Apache, Nginx, or PHP built-in server)
 
 ### Installation
 
 1. **Clone or download this template**
 
-2. **Initialize the database**
+2. **Install dependencies**
+   ```bash
+   composer install
+   ```
+
+3. **Initialize the database**
    ```bash
    php database/init.php
+   php database/migrate_google_oauth.php
    ```
 
-3. **Start the server**
+4. **Set up Google OAuth** (required)
+   
+   Follow the detailed guide in `GOOGLE_OAUTH_SETUP.md` to:
+   - Create a Google Cloud project
+   - Configure OAuth consent screen
+   - Get your Client ID and Client Secret
+   - Update `config.php` with your credentials
+
+5. **Start the server**
    ```bash
    # Using PHP built-in server
-   php -S localhost:8000
+   php -S localhost:9000
    ```
 
-4. **Open your browser**
+6. **Open your browser**
    ```
-   http://localhost:8000
+   http://localhost:9000
    ```
+
+7. **Sign in with Google**
+   
+   Click "Sign in with Google" and authenticate. Your account will be created automatically!
 
 ## Project Structure 📁
 
 ```
 PHP SaaS Template/
-├── index.php              # Homepage
-├── config.php             # Configuration settings
-├── README.md              # This file
+├── index.php                     # Homepage
+├── config.php                    # Configuration settings
+├── composer.json                 # Dependency management
+├── README.md                     # This file
+├── GOOGLE_OAUTH_SETUP.md        # Google OAuth setup guide
+├── .gitignore                   # Git ignore rules
+├── auth/
+│   ├── google-login.php         # Initiate Google OAuth
+│   ├── google-callback.php      # OAuth callback handler
+│   └── logout.php               # Logout handler
+├── dashboard/
+│   └── index.php                # User dashboard
+├── includes/
+│   ├── Auth.php                 # Authentication class
+│   ├── GoogleOAuth.php          # Google OAuth handler
+│   ├── helpers.php              # Helper functions
 ├── assets/
 │   ├── css/
-│   │   └── style.css      # Main stylesheet
+│   │   └── style.css            # Main stylesheet
 │   ├── js/
-│   │   └── main.js        # JavaScript functionality
+│   │   └── main.js              # JavaScript functionality
 │   └── images/
-│       ├── star.svg       # Star icon
-│       └── laurel.svg     # Laurel badge
+│       ├── star.svg             # Star icon
+│       └── laurel.svg           # Laurel badge
 ├── database/
-│   ├── init.php           # Database initialization script
-│   ├── Database.php       # Database class
-│   └── saas.db           # SQLite database (created after init)
+│   ├── init.php                 # Database initialization
+│   ├── migrate_google_oauth.php # OAuth migration
+│   ├── Database.php             # Database class
+│   └── saas.db                  # SQLite database
+├── uploads/
+│   └── avatars/                 # User avatar uploads
+└── vendor/                      # Composer dependencies
 ```
 
 ## Database Schema 🗄️
 
 ### Users Table
 - User authentication and profile information
-- Fields: id, username, email, password_hash, full_name, avatar_url, created_at, etc.
+- Fields: id, username, email, password_hash (nullable), full_name, avatar_url, google_id, oauth_provider, created_at, etc.
 
 ### Sessions Table
 - Manage user sessions securely
@@ -90,40 +128,62 @@ PHP SaaS Template/
 Edit `config.php` to customize:
 
 ```php
+// Site settings
 define('SITE_NAME', 'YourSaaS');
-define('SITE_URL', 'http://localhost');
+define('SITE_URL', 'http://localhost:9000');
 define('SITE_EMAIL', 'hello@yoursaas.com');
-define('SESSION_LIFETIME', 86400);
+
+// Google OAuth (REQUIRED - see GOOGLE_OAUTH_SETUP.md)
+define('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID');
+define('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET');
+
+// Security
+define('SESSION_LIFETIME', 86400); // 24 hours
 define('ENABLE_REGISTRATION', true);
 ```
 
+**Important**: You must set up Google OAuth credentials before the authentication will work. See `GOOGLE_OAUTH_SETUP.md` for detailed instructions.
+
+## Current Status 📊
+
+### ✅ Completed (Milestone 1)
+
+- **Google OAuth Authentication**: One-click sign-in with Google
+- **User Management**: Automatic user creation and profile updates
+- **Session Management**: Secure database-backed sessions with tokens
+- **Activity Logging**: Track user login/logout events
+- **Basic Dashboard**: Personalized dashboard for authenticated users
+- **Security**: CSRF protection, XSS prevention, secure session handling
+
+### 🚧 In Progress
+
+- **Custom Dashboard**: Design and implement custom dashboard features (Milestone 2)
+- **Profile Management**: Advanced profile editing and avatar uploads (Milestone 2)
+- **Account Settings**: Comprehensive account management (Milestone 2)
+
+### 📋 Upcoming (Milestone 3)
+
+- **Stripe Integration**: Full subscription and payment processing
+- **Pricing Page**: Display pricing tiers with checkout
+- **Subscription Management**: Upgrade, downgrade, and cancel subscriptions
+- **Payment History**: View invoices and payment records
+- **Webhook Handling**: Process Stripe subscription events
+
 ## Next Steps 🛠️
 
-### To Complete Your SaaS:
+### Phase 1: Complete Dashboard (Milestone 2)
+After discussing your specific requirements:
+- Custom dashboard layout and features
+- Profile management interface
+- Account settings page
+- Activity feed and notifications
 
-1. **Authentication Pages**
-   - Create `login.php` for user login
-   - Create `signup.php` for new user registration
-   - Create `logout.php` for session termination
-   - Create `forgot-password.php` for password recovery
-
-2. **User Dashboard**
-   - Create `dashboard.php` for logged-in users
-   - Create `profile.php` for user profile management
-   - Create `settings.php` for account settings
-
-3. **Additional Pages**
-   - Create `pricing.php` to display pricing tiers
-   - Create `features.php` to showcase features
-   - Create `about.php` for company information
-   - Create `contact.php` for contact form
-
-4. **Core Functionality**
-   - Implement user authentication logic
-   - Add form validation
-   - Set up email notifications
-   - Integrate payment processing (Stripe, PayPal)
-   - Add admin panel
+### Phase 2: Add Stripe Payments (Milestone 3)
+- Set up Stripe account and get API keys
+- Create pricing page with tier comparison
+- Implement Stripe Checkout integration
+- Build subscription management interface
+- Set up webhook handlers for subscription events
 
 ## Customization 🎨
 
@@ -161,7 +221,35 @@ Edit `index.php` to change:
 - **Sessions**: Regenerate session IDs after login
 - **Production**: Disable error display in production
 
-## Database Class Usage 💾
+## Authentication Usage 🔐
+
+### Using the Auth Class
+
+```php
+require_once 'config.php';
+require_once 'includes/Auth.php';
+
+$auth = new Auth();
+
+// Check if user is logged in
+if ($auth->isLoggedIn()) {
+    // Get current user data
+    $user = $auth->getCurrentUser();
+    echo "Welcome, " . $user['full_name'];
+}
+
+// Protect a page (requires authentication)
+$auth->requireAuth();
+
+// Get the Google OAuth URL
+$googleOAuth = $auth->getGoogleOAuth();
+$authUrl = $googleOAuth->getAuthUrl();
+
+// Logout
+$auth->logout();
+```
+
+### Using the Database Class
 
 ```php
 require_once 'config.php';
@@ -169,30 +257,33 @@ require_once 'database/Database.php';
 
 $db = Database::getInstance();
 
-// Insert
-$userId = $db->insert('users', [
-    'username' => 'john',
-    'email' => 'john@example.com',
-    'password_hash' => password_hash('password', PASSWORD_DEFAULT)
+// Fetch user data
+$user = $db->fetchOne('SELECT * FROM users WHERE id = :id', [
+    'id' => 1
 ]);
 
-// Query
-$user = $db->fetchOne('SELECT * FROM users WHERE username = :username', [
-    'username' => 'john'
+// Insert data
+$id = $db->insert('activity_log', [
+    'user_id' => 1,
+    'action' => 'page_view',
+    'description' => 'Viewed pricing page'
 ]);
 
-// Update
+// Update data
 $db->update('users', 
     ['full_name' => 'John Doe'],
     'id = :id',
-    ['id' => $userId]
+    ['id' => 1]
 );
 ```
 
 ## Technologies Used 🔧
 
-- **PHP**: Server-side logic
+- **PHP 7.4+**: Server-side logic
+- **Composer**: Dependency management
+- **Google API Client**: OAuth 2.0 authentication
 - **SQLite**: Lightweight database
+- **Stripe PHP SDK**: Payment processing (Milestone 3)
 - **CSS3**: Modern styling with CSS Grid and Flexbox
 - **JavaScript**: Interactive features
 - **SVG**: Scalable icons
