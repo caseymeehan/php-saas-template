@@ -14,10 +14,19 @@ define('SITE_NAME', 'YourSaaS');
 define('SITE_URL', 'http://localhost:9000');
 define('SITE_EMAIL', 'hello@yoursaas.com');
 
+// Load local configuration overrides (gitignored - for actual credentials)
+if (file_exists(__DIR__ . '/config.local.php')) {
+    require_once __DIR__ . '/config.local.php';
+}
+
 // Google OAuth Configuration
-// Set these in your environment or replace with your actual credentials
-define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID') ?: 'YOUR_GOOGLE_CLIENT_ID');
-define('GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: 'YOUR_GOOGLE_CLIENT_SECRET');
+// These will be overridden by config.local.php if it exists
+if (!defined('GOOGLE_CLIENT_ID')) {
+    define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID') ?: 'YOUR_GOOGLE_CLIENT_ID');
+}
+if (!defined('GOOGLE_CLIENT_SECRET')) {
+    define('GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: 'YOUR_GOOGLE_CLIENT_SECRET');
+}
 define('GOOGLE_REDIRECT_URI', SITE_URL . '/auth/google-callback.php');
 
 // Stripe Configuration (to be configured in Milestone 3)
