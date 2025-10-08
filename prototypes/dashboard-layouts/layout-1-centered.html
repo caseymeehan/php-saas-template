@@ -1,39 +1,9 @@
-<?php
-/**
- * Dashboard - Items Management
- * Main dashboard page for authenticated users
- */
-
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../includes/Auth.php';
-require_once __DIR__ . '/../includes/Items.php';
-
-$auth = new Auth();
-$auth->requireAuth();
-
-$user = $auth->getCurrentUser();
-if (!$user) {
-    flashMessage('error', 'Unable to load user data.');
-    redirect('../auth/logout.php');
-}
-
-// Initialize Items class
-$itemsManager = new Items();
-
-// Get user's items
-$items = $itemsManager->getUserItems($user['id']);
-$itemCount = count($items);
-
-// Page title
-$pageTitle = 'Items';
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle . ' - ' . SITE_NAME; ?></title>
-    <link rel="stylesheet" href="<?php echo url('assets/css/style.css'); ?>">
+    <title>Dashboard - Layout 1: Centered Content</title>
     <style>
         * {
             margin: 0;
@@ -74,7 +44,6 @@ $pageTitle = 'Items';
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            text-decoration: none;
         }
 
         /* Account Dropdown */
@@ -129,6 +98,7 @@ $pageTitle = 'Items';
             color: #6b7280;
         }
 
+        /* Dropdown Menu */
         .dropdown-menu {
             position: absolute;
             top: calc(100% + 0.5rem);
@@ -204,7 +174,6 @@ $pageTitle = 'Items';
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            text-decoration: none;
         }
 
         .new-btn:hover {
@@ -305,96 +274,20 @@ $pageTitle = 'Items';
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 6rem 2rem;
+            padding: 4rem 2rem;
             background: white;
             border: 2px dashed #e5e7eb;
-            border-radius: 12px;
-            margin-top: 2rem;
+            border-radius: 8px;
         }
 
         .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            opacity: 0.5;
-        }
-
-        .empty-state-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 0.75rem;
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
 
         .empty-state-text {
             color: #6b7280;
-            font-size: 1rem;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .empty-state-btn {
-            background: #6366f1;
-            color: white;
-            padding: 0.875rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-        }
-
-        .empty-state-btn:hover {
-            background: #4f46e5;
-        }
-
-        /* Flash Messages */
-        .flash-messages {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 1000;
-            max-width: 400px;
-        }
-
-        .flash-message {
-            padding: 1rem 1.5rem;
-            margin-bottom: 0.5rem;
-            border-radius: 8px;
-            background: white;
-            border-left: 4px solid;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .flash-message.success {
-            border-left-color: #10b981;
-            color: #065f46;
-        }
-
-        .flash-message.error {
-            border-left-color: #ef4444;
-            color: #991b1b;
-        }
-
-        .flash-message.info {
-            border-left-color: #3b82f6;
-            color: #1e40af;
+            font-size: 1.125rem;
         }
 
         /* Responsive */
@@ -421,110 +314,125 @@ $pageTitle = 'Items';
             .item-title {
                 font-size: 0.9375rem;
             }
-
-            .empty-state {
-                padding: 4rem 1.5rem;
-            }
-
-            .empty-state-icon {
-                font-size: 3rem;
-            }
-
-            .empty-state-title {
-                font-size: 1.25rem;
-            }
-
-            .empty-state-btn {
-                width: 100%;
-                justify-content: center;
-            }
         }
     </style>
 </head>
 <body>
+    <!-- Prototype Note -->
+    <div style="background: #fef3c7; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid #fbbf24;">
+        🎨 <strong>LAYOUT 1: CENTERED CONTENT</strong> - Max-width container with breathing room
+    </div>
+
     <!-- Top Header -->
     <header class="top-header">
         <div class="header-content">
-            <a href="<?php echo url('/dashboard/'); ?>" class="site-logo">
+            <div class="site-logo">
                 <span>🚀</span>
-                <span><?php echo SITE_NAME; ?></span>
-            </a>
+                <span>YourSaaS</span>
+            </div>
             
             <!-- Account Dropdown -->
             <div class="account-wrapper">
                 <div class="account-trigger" onclick="toggleDropdown()">
                     <div class="avatar">
-                        <?php if ($user['avatar_url']): ?>
-                            <img src="<?php echo escape($user['avatar_url']); ?>" alt="<?php echo escape($user['full_name']); ?>">
-                        <?php else: ?>
-                            <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
-                        <?php endif; ?>
+                        <img src="https://lh3.googleusercontent.com/a/default-user" alt="User Avatar" onerror="this.style.display='none'; this.parentElement.textContent='JD';">
                     </div>
                     <span class="account-text">Account</span>
                     <span class="dropdown-arrow">▼</span>
                 </div>
                 
                 <div class="dropdown-menu" id="accountDropdown">
-                    <a href="<?php echo url('/dashboard/profile.php'); ?>" class="dropdown-item">Profile</a>
+                    <a href="/dashboard/" class="dropdown-item">Profile</a>
                     <a href="#" class="dropdown-item">Settings</a>
-                    <a href="<?php echo url('/auth/logout.php'); ?>" class="dropdown-item danger">Log Out</a>
+                    <a href="/auth/logout.php" class="dropdown-item danger">Log Out</a>
                 </div>
             </div>
         </div>
     </header>
-
-    <!-- Flash Messages -->
-    <?php if (hasFlashMessages()): ?>
-        <div class="flash-messages">
-            <?php foreach (getFlashMessages() as $flash): ?>
-                <div class="flash-message <?php echo escape($flash['type']); ?>">
-                    <?php echo escape($flash['message']); ?>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
 
     <!-- Main Content -->
     <main class="main-container">
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">Items</h1>
-            <a href="<?php echo url('/dashboard/item-new.php'); ?>" class="new-btn">
+            <button class="new-btn" onclick="createNewItem()">
                 <span>+</span> New
-            </a>
+            </button>
         </div>
 
-        <?php if ($itemCount > 0): ?>
-            <!-- Items List -->
-            <div class="items-list">
-                <?php foreach ($items as $item): ?>
-                    <div class="item-row" onclick="editItem(<?php echo $item['id']; ?>)">
-                        <div class="item-title"><?php echo escape($item['title']); ?></div>
-                        <div class="hamburger-menu">
-                            <button class="hamburger-btn" onclick="toggleHamburger(event, <?php echo $item['id']; ?>)">⋮</button>
-                            <div class="hamburger-dropdown" id="hamburger-<?php echo $item['id']; ?>">
-                                <div class="hamburger-item" onclick="editItem(<?php echo $item['id']; ?>)">Edit</div>
-                                <div class="hamburger-item" onclick="duplicateItem(<?php echo $item['id']; ?>)">Duplicate</div>
-                                <div class="hamburger-item danger" onclick="deleteItem(<?php echo $item['id']; ?>)">Delete</div>
-                            </div>
-                        </div>
+        <!-- Items List -->
+        <div class="items-list">
+            <!-- Item 1 -->
+            <div class="item-row" onclick="editItem(1)">
+                <div class="item-title">Project Alpha - Website Redesign</div>
+                <div class="hamburger-menu">
+                    <button class="hamburger-btn" onclick="toggleHamburger(event, 1)">⋮</button>
+                    <div class="hamburger-dropdown" id="hamburger-1">
+                        <div class="hamburger-item" onclick="editItem(1)">Edit</div>
+                        <div class="hamburger-item" onclick="duplicateItem(1)">Duplicate</div>
+                        <div class="hamburger-item danger" onclick="deleteItem(1)">Delete</div>
                     </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <!-- Empty State -->
-            <div class="empty-state">
-                <div class="empty-state-icon">📋</div>
-                <div class="empty-state-title">No items yet</div>
-                <div class="empty-state-text">
-                    Get started by creating your first item.<br>
-                    Click the button below to begin.
                 </div>
-                <a href="<?php echo url('/dashboard/item-new.php'); ?>" class="empty-state-btn">
-                    <span style="font-size: 1.25rem;">+</span> Create your first item
-                </a>
             </div>
-        <?php endif; ?>
+
+            <!-- Item 2 -->
+            <div class="item-row" onclick="editItem(2)">
+                <div class="item-title">Marketing Campaign Q1 2025</div>
+                <div class="hamburger-menu">
+                    <button class="hamburger-btn" onclick="toggleHamburger(event, 2)">⋮</button>
+                    <div class="hamburger-dropdown" id="hamburger-2">
+                        <div class="hamburger-item" onclick="editItem(2)">Edit</div>
+                        <div class="hamburger-item" onclick="duplicateItem(2)">Duplicate</div>
+                        <div class="hamburger-item danger" onclick="deleteItem(2)">Delete</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="item-row" onclick="editItem(3)">
+                <div class="item-title">Customer Onboarding Flow</div>
+                <div class="hamburger-menu">
+                    <button class="hamburger-btn" onclick="toggleHamburger(event, 3)">⋮</button>
+                    <div class="hamburger-dropdown" id="hamburger-3">
+                        <div class="hamburger-item" onclick="editItem(3)">Edit</div>
+                        <div class="hamburger-item" onclick="duplicateItem(3)">Duplicate</div>
+                        <div class="hamburger-item danger" onclick="deleteItem(3)">Delete</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="item-row" onclick="editItem(4)">
+                <div class="item-title">API Integration Documentation</div>
+                <div class="hamburger-menu">
+                    <button class="hamburger-btn" onclick="toggleHamburger(event, 4)">⋮</button>
+                    <div class="hamburger-dropdown" id="hamburger-4">
+                        <div class="hamburger-item" onclick="editItem(4)">Edit</div>
+                        <div class="hamburger-item" onclick="duplicateItem(4)">Duplicate</div>
+                        <div class="hamburger-item danger" onclick="deleteItem(4)">Delete</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="item-row" onclick="editItem(5)">
+                <div class="item-title">Product Roadmap Review</div>
+                <div class="hamburger-menu">
+                    <button class="hamburger-btn" onclick="toggleHamburger(event, 5)">⋮</button>
+                    <div class="hamburger-dropdown" id="hamburger-5">
+                        <div class="hamburger-item" onclick="editItem(5)">Edit</div>
+                        <div class="hamburger-item" onclick="duplicateItem(5)">Duplicate</div>
+                        <div class="hamburger-item danger" onclick="deleteItem(5)">Delete</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State Example (uncomment to see) -->
+        <!-- <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-text">No items yet. Click "New" to create your first item.</div>
+        </div> -->
     </main>
 
     <script>
@@ -565,22 +473,25 @@ $pageTitle = 'Items';
             }
         });
 
-        // Action Functions
+        // Action Functions (placeholders)
+        function createNewItem() {
+            alert('Create New Item - This will open a modal or form');
+        }
+
         function editItem(itemId) {
-            window.location.href = '<?php echo url('/dashboard/item-edit.php'); ?>?id=' + itemId;
+            alert(`Edit Item ${itemId} - This will open edit view`);
         }
 
         function duplicateItem(itemId) {
-            if (confirm('Duplicate this item?')) {
-                window.location.href = '<?php echo url('/dashboard/item-actions.php'); ?>?action=duplicate&id=' + itemId;
-            }
+            alert(`Duplicate Item ${itemId}`);
         }
 
         function deleteItem(itemId) {
-            if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
-                window.location.href = '<?php echo url('/dashboard/item-actions.php'); ?>?action=delete&id=' + itemId;
+            if (confirm(`Are you sure you want to delete Item ${itemId}?`)) {
+                alert(`Item ${itemId} deleted`);
             }
         }
     </script>
 </body>
 </html>
+
