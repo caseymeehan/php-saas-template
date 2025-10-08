@@ -18,11 +18,14 @@ if (!$user) {
 }
 
 // Initialize Items class
-$itemsManager = new Items();
+$itemsManager = new Items($user['id']);
 
 // Get user's items
 $items = $itemsManager->getUserItems($user['id']);
 $itemCount = count($items);
+
+// Get usage information
+$usage = $itemsManager->getUserUsage($user['id']);
 
 // Page title
 $pageTitle = 'Items';
@@ -117,6 +120,19 @@ $pageTitle = 'Items';
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+        }
+        
+        .avatar-fallback {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
         }
 
         .account-text {
@@ -352,6 +368,105 @@ $pageTitle = 'Items';
             background: #4f46e5;
         }
 
+        /* Usage Widget */
+        .usage-widget {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .usage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .usage-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .usage-plan {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        .usage-plan.free {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .usage-plan.pro {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .usage-plan.enterprise {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .usage-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .usage-count .limit {
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        .usage-progress {
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .usage-progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .usage-progress-bar.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .usage-progress-bar.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .usage-upgrade {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            background: #6366f1;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .usage-upgrade:hover {
+            background: #4f46e5;
+        }
+
         /* Flash Messages */
         .flash-messages {
             position: fixed;
@@ -363,12 +478,14 @@ $pageTitle = 'Items';
 
         .flash-message {
             padding: 1rem 1.5rem;
+            padding-right: 3rem;
             margin-bottom: 0.5rem;
             border-radius: 8px;
             background: white;
             border-left: 4px solid;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             animation: slideIn 0.3s ease-out;
+            position: relative;
         }
 
         @keyframes slideIn {
@@ -380,6 +497,21 @@ $pageTitle = 'Items';
                 transform: translateX(0);
                 opacity: 1;
             }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
+        .flash-message.dismissing {
+            animation: slideOut 0.3s ease-in forwards;
         }
 
         .flash-message.success {
@@ -395,6 +527,25 @@ $pageTitle = 'Items';
         .flash-message.info {
             border-left-color: #3b82f6;
             color: #1e40af;
+        }
+        
+        .flash-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: transparent;
+            border: none;
+            color: currentColor;
+            opacity: 0.5;
+            cursor: pointer;
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 0.25rem;
+            transition: opacity 0.2s;
+        }
+        
+        .flash-close:hover {
+            opacity: 1;
         }
 
         /* Responsive */
@@ -455,9 +606,17 @@ $pageTitle = 'Items';
                 <div class="account-trigger" onclick="toggleDropdown()">
                     <div class="avatar">
                         <?php if ($user['avatar_url']): ?>
-                            <img src="<?php echo escape($user['avatar_url']); ?>" alt="<?php echo escape($user['full_name']); ?>">
+                            <img src="<?php echo escape($user['avatar_url']); ?>" 
+                                 alt="<?php echo escape($user['full_name']); ?>"
+                                 referrerpolicy="no-referrer"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="avatar-fallback" style="display: none;">
+                                <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
+                            </div>
                         <?php else: ?>
-                            <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
+                            <div class="avatar-fallback">
+                                <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
+                            </div>
                         <?php endif; ?>
                     </div>
                     <span class="account-text">Account</span>
@@ -465,8 +624,8 @@ $pageTitle = 'Items';
                 </div>
                 
                 <div class="dropdown-menu" id="accountDropdown">
-                    <a href="<?php echo url('/dashboard/profile.php'); ?>" class="dropdown-item">Profile</a>
-                    <a href="#" class="dropdown-item">Settings</a>
+                    <a href="<?php echo url('/dashboard/profile.php'); ?>" class="dropdown-item">Profile & Billing</a>
+                    <a href="<?php echo url('/pricing.php'); ?>" class="dropdown-item">Pricing</a>
                     <a href="<?php echo url('/auth/logout.php'); ?>" class="dropdown-item danger">Log Out</a>
                 </div>
             </div>
@@ -479,6 +638,7 @@ $pageTitle = 'Items';
             <?php foreach (getFlashMessages() as $flash): ?>
                 <div class="flash-message <?php echo escape($flash['type']); ?>">
                     <?php echo escape($flash['message']); ?>
+                    <button class="flash-close" onclick="dismissFlash(this)" aria-label="Close">&times;</button>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -489,9 +649,59 @@ $pageTitle = 'Items';
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">Items</h1>
-            <a href="<?php echo url('/dashboard/item-new.php'); ?>" class="new-btn">
-                <span>+</span> New
-            </a>
+            <?php if ($usage['can_create']): ?>
+                <a href="<?php echo url('/dashboard/item-new.php'); ?>" class="new-btn">
+                    <span>+</span> New
+                </a>
+            <?php else: ?>
+                <a href="<?php echo url('/pricing.php'); ?>" class="new-btn" style="background: #f59e0b;">
+                    <span>⚡</span> Upgrade
+                </a>
+            <?php endif; ?>
+        </div>
+
+        <!-- Usage Widget -->
+        <div class="usage-widget">
+            <div class="usage-header">
+                <div class="usage-title">Item Usage</div>
+                <div class="usage-plan <?php echo $usage['plan']; ?>">
+                    <?php echo ucfirst($usage['plan']); ?> Plan
+                </div>
+            </div>
+            
+            <div class="usage-count">
+                <?php echo $usage['current']; ?>
+                <?php if ($usage['limit'] !== null): ?>
+                    <span class="limit">/ <?php echo $usage['limit']; ?> items</span>
+                <?php else: ?>
+                    <span class="limit">items (unlimited)</span>
+                <?php endif; ?>
+            </div>
+            
+            <?php if ($usage['limit'] !== null): ?>
+                <div class="usage-progress">
+                    <?php 
+                        $progressClass = '';
+                        if ($usage['percentage'] >= 90) {
+                            $progressClass = 'danger';
+                        } elseif ($usage['percentage'] >= 70) {
+                            $progressClass = 'warning';
+                        }
+                    ?>
+                    <div class="usage-progress-bar <?php echo $progressClass; ?>" 
+                         style="width: <?php echo min($usage['percentage'], 100); ?>%"></div>
+                </div>
+                
+                <?php if (!$usage['can_create']): ?>
+                    <a href="<?php echo url('pricing.php'); ?>" class="usage-upgrade">
+                        ⚡ Upgrade to create more items
+                    </a>
+                <?php elseif ($usage['percentage'] >= 70): ?>
+                    <a href="<?php echo url('pricing.php'); ?>" class="usage-upgrade">
+                        📈 Upgrade your plan
+                    </a>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
 
         <?php if ($itemCount > 0): ?>
@@ -503,9 +713,9 @@ $pageTitle = 'Items';
                         <div class="hamburger-menu">
                             <button class="hamburger-btn" onclick="toggleHamburger(event, <?php echo $item['id']; ?>)">⋮</button>
                             <div class="hamburger-dropdown" id="hamburger-<?php echo $item['id']; ?>">
-                                <div class="hamburger-item" onclick="editItem(<?php echo $item['id']; ?>)">Edit</div>
-                                <div class="hamburger-item" onclick="duplicateItem(<?php echo $item['id']; ?>)">Duplicate</div>
-                                <div class="hamburger-item danger" onclick="deleteItem(<?php echo $item['id']; ?>)">Delete</div>
+                                <div class="hamburger-item" onclick="editItem(event, <?php echo $item['id']; ?>)">Edit</div>
+                                <div class="hamburger-item" onclick="duplicateItem(event, <?php echo $item['id']; ?>)">Duplicate</div>
+                                <div class="hamburger-item danger" onclick="deleteItem(event, <?php echo $item['id']; ?>)">Delete</div>
                             </div>
                         </div>
                     </div>
@@ -566,21 +776,54 @@ $pageTitle = 'Items';
         });
 
         // Action Functions
-        function editItem(itemId) {
-            window.location.href = '<?php echo url('/dashboard/item-edit.php'); ?>?id=' + itemId;
+        function editItem(eventOrId, itemId) {
+            // Handle both (event, id) and (id) signatures for backwards compatibility
+            if (typeof eventOrId === 'object' && eventOrId.stopPropagation) {
+                eventOrId.stopPropagation();
+                window.location.href = '<?php echo url('/dashboard/item-edit.php'); ?>?id=' + itemId;
+            } else {
+                // Called from row click - eventOrId is actually the itemId
+                window.location.href = '<?php echo url('/dashboard/item-edit.php'); ?>?id=' + eventOrId;
+            }
         }
 
-        function duplicateItem(itemId) {
+        function duplicateItem(event, itemId) {
+            event.stopPropagation();
             if (confirm('Duplicate this item?')) {
                 window.location.href = '<?php echo url('/dashboard/item-actions.php'); ?>?action=duplicate&id=' + itemId;
             }
         }
 
-        function deleteItem(itemId) {
+        function deleteItem(event, itemId) {
+            event.stopPropagation();
             if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
                 window.location.href = '<?php echo url('/dashboard/item-actions.php'); ?>?action=delete&id=' + itemId;
             }
         }
+        
+        // Flash message handling
+        function dismissFlash(button) {
+            const flashMessage = button.closest('.flash-message');
+            flashMessage.classList.add('dismissing');
+            setTimeout(() => {
+                flashMessage.remove();
+            }, 300);
+        }
+        
+        // Auto-dismiss flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                setTimeout(function() {
+                    if (message.parentElement) {
+                        message.classList.add('dismissing');
+                        setTimeout(() => {
+                            message.remove();
+                        }, 300);
+                    }
+                }, 5000);
+            });
+        });
     </script>
 </body>
 </html>

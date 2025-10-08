@@ -29,10 +29,18 @@ if (!defined('GOOGLE_CLIENT_SECRET')) {
 }
 define('GOOGLE_REDIRECT_URI', SITE_URL . '/auth/google-callback.php');
 
-// Stripe Configuration (to be configured in Milestone 3)
-define('STRIPE_PUBLISHABLE_KEY', 'pk_test_YOUR_KEY');
-define('STRIPE_SECRET_KEY', 'sk_test_YOUR_KEY');
-define('STRIPE_WEBHOOK_SECRET', 'whsec_YOUR_WEBHOOK_SECRET');
+// Stripe Configuration
+// These should be overridden in config.local.php with your actual keys
+if (!defined('STRIPE_PUBLISHABLE_KEY')) {
+    define('STRIPE_PUBLISHABLE_KEY', getenv('STRIPE_PUBLISHABLE_KEY') ?: 'pk_test_YOUR_KEY');
+}
+if (!defined('STRIPE_SECRET_KEY')) {
+    define('STRIPE_SECRET_KEY', getenv('STRIPE_SECRET_KEY') ?: 'sk_test_YOUR_KEY');
+}
+if (!defined('STRIPE_WEBHOOK_SECRET')) {
+    define('STRIPE_WEBHOOK_SECRET', getenv('STRIPE_WEBHOOK_SECRET') ?: 'whsec_YOUR_WEBHOOK_SECRET');
+}
+define('STRIPE_WEBHOOK_URL', SITE_URL . '/webhooks/stripe.php');
 
 // Security
 define('SESSION_LIFETIME', 86400); // 24 hours
@@ -52,21 +60,24 @@ define('PRICING_PLANS', [
         'price' => 0,
         'currency' => 'USD',
         'billing_cycle' => 'month',
-        'stripe_price_id' => null
+        'stripe_price_id' => null,
+        'item_limit' => 5
     ],
     'pro' => [
         'name' => 'Pro',
         'price' => 29,
         'currency' => 'USD',
         'billing_cycle' => 'month',
-        'stripe_price_id' => 'price_YOUR_PRO_PRICE_ID'
+        'stripe_price_id' => 'price_1SG3uOCp2cRkQZ2fBowffJlM',
+        'item_limit' => 50
     ],
     'enterprise' => [
         'name' => 'Enterprise',
         'price' => 99,
         'currency' => 'USD',
         'billing_cycle' => 'month',
-        'stripe_price_id' => 'price_YOUR_ENTERPRISE_PRICE_ID'
+        'stripe_price_id' => 'price_1SG3ugCp2cRkQZ2fZs6l8j4B',
+        'item_limit' => null // unlimited
     ]
 ]);
 

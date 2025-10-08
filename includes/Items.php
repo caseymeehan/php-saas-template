@@ -5,12 +5,17 @@
  */
 
 require_once __DIR__ . '/../database/Database.php';
+require_once __DIR__ . '/Subscription.php';
 
 class Items {
     private $db;
+    private $subscription;
     
-    public function __construct() {
+    public function __construct($userId = null) {
         $this->db = Database::getInstance();
+        if ($userId) {
+            $this->subscription = new Subscription($userId);
+        }
     }
     
     /**
@@ -133,6 +138,41 @@ class Items {
         $query = "SELECT COUNT(*) as count FROM items WHERE user_id = :user_id";
         $result = $this->db->fetchOne($query, ['user_id' => $userId]);
         return $result ? (int)$result['count'] : 0;
+    }
+    
+    /**
+     * Get usage information for a user (items count with limits)
+     * @param int $userId
+     * @return array ['current' => int, 'limit' => int|null, 'plan' => string, 'can_create' => bool, 'percentage' => float]
+     */
+    public function getUserUsage($userId) {
+        if (!$this->subscription) {
+            $this->subscription = new Subscription($userId);
+        }
+        
+        $usageInfo = $this->subscription->canCreateItem();
+        
+        // Calculate percentage for progress bar
+        $percentage = 0;
+        if ($usageInfo['limit'] !== null && $usageInfo['limit'] > 0) {
+            $percentage = ($usageInfo['current'] / $usageInfo['limit']) * 100;
+        }
+        
+        return array_merge($usageInfo, ['percentage' => $percentage]);
+    }
+    
+    /**
+     * Check if user can create more items
+     * @param int $userId
+     * @return bool
+     */
+    public function canCreateItem($userId) {
+        if (!$this->subscription) {
+            $this->subscription = new Subscription($userId);
+        }
+        
+        $usageInfo = $this->subscription->canCreateItem();
+        return $usageInfo['can_create'];
     }
 }
 

@@ -17,7 +17,11 @@ if (!$user) {
     redirect('../auth/logout.php');
 }
 
-$itemsManager = new Items();
+$itemsManager = new Items($user['id']);
+
+// Check if user can create more items
+$usage = $itemsManager->getUserUsage($user['id']);
+$canCreate = $usage['can_create'];
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,6 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (empty($title)) {
         flashMessage('error', 'Title is required.');
+    } elseif (!$canCreate) {
+        flashMessage('error', 'You have reached your item limit. Please upgrade your plan to create more items.');
+        redirect('../pricing.php');
     } else {
         $itemId = $itemsManager->createItem($user['id'], $title, $description);
         
@@ -193,11 +200,40 @@ $pageTitle = 'New Item';
 
         .flash-message {
             padding: 1rem 1.5rem;
+            padding-right: 3rem;
             margin-bottom: 0.5rem;
             border-radius: 8px;
             background: white;
             border-left: 4px solid;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
+        .flash-message.dismissing {
+            animation: slideOut 0.3s ease-in forwards;
         }
 
         .flash-message.success {
@@ -208,6 +244,25 @@ $pageTitle = 'New Item';
         .flash-message.error {
             border-left-color: #ef4444;
             color: #991b1b;
+        }
+        
+        .flash-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: transparent;
+            border: none;
+            color: currentColor;
+            opacity: 0.5;
+            cursor: pointer;
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 0.25rem;
+            transition: opacity 0.2s;
+        }
+        
+        .flash-close:hover {
+            opacity: 1;
         }
 
         @media (max-width: 768px) {
@@ -248,16 +303,25 @@ $pageTitle = 'New Item';
             <?php foreach (getFlashMessages() as $flash): ?>
                 <div class="flash-message <?php echo escape($flash['type']); ?>">
                     <?php echo escape($flash['message']); ?>
+                    <button class="flash-close" onclick="dismissFlash(this)" aria-label="Close">&times;</button>
                 </div>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
 
     <main class="main-container">
+        <?php if (!$canCreate): ?>
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; color: #991b1b;">
+                <h3 style="margin: 0 0 0.5rem 0; font-size: 1.125rem;">Item Limit Reached</h3>
+                <p style="margin: 0 0 1rem 0;">You've reached your limit of <?php echo $usage['limit']; ?> items on the <?php echo ucfirst($usage['plan']); ?> plan.</p>
+                <a href="<?php echo url('pricing.php'); ?>" style="display: inline-block; padding: 0.625rem 1.25rem; background: #6366f1; color: white; text-decoration: none; border-radius: 8px; font-weight: 500;">Upgrade Your Plan</a>
+            </div>
+        <?php endif; ?>
+        
         <div class="form-card">
             <h1 class="form-title">Create New Item</h1>
             
-            <form method="POST" action="">
+            <form method="POST" action="" <?php echo !$canCreate ? 'style="opacity: 0.5; pointer-events: none;"' : ''; ?>>
                 <div class="form-group">
                     <label for="title" class="form-label">Title *</label>
                     <input 
@@ -288,6 +352,32 @@ $pageTitle = 'New Item';
             </form>
         </div>
     </main>
+    
+    <script>
+        // Flash message handling
+        function dismissFlash(button) {
+            const flashMessage = button.closest('.flash-message');
+            flashMessage.classList.add('dismissing');
+            setTimeout(() => {
+                flashMessage.remove();
+            }, 300);
+        }
+        
+        // Auto-dismiss flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                setTimeout(function() {
+                    if (message.parentElement) {
+                        message.classList.add('dismissing');
+                        setTimeout(() => {
+                            message.remove();
+                        }, 300);
+                    }
+                }, 5000);
+            });
+        });
+    </script>
 </body>
 </html>
 

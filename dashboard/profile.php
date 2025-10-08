@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/Auth.php';
+require_once __DIR__ . '/../includes/Subscription.php';
 
 $auth = new Auth();
 $auth->requireAuth();
@@ -14,6 +15,29 @@ $user = $auth->getCurrentUser();
 if (!$user) {
     flashMessage('error', 'Unable to load user data.');
     redirect('../auth/logout.php');
+}
+
+$subscriptionManager = new Subscription($user['id']);
+$subscription = $subscriptionManager->getCurrentSubscription();
+$currentPlan = $subscription ? $subscription['plan_name'] : 'free';
+
+// Handle subscription cancellation/reactivation
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if ($_POST['action'] === 'cancel') {
+        if ($subscriptionManager->cancelSubscription()) {
+            flashMessage('success', 'Your subscription has been scheduled for cancellation at the end of the billing period.');
+        } else {
+            flashMessage('error', 'Unable to cancel subscription. Please try again.');
+        }
+        redirect('profile.php');
+    } elseif ($_POST['action'] === 'reactivate') {
+        if ($subscriptionManager->reactivateSubscription()) {
+            flashMessage('success', 'Your subscription has been reactivated!');
+        } else {
+            flashMessage('error', 'Unable to reactivate subscription. Please try again.');
+        }
+        redirect('profile.php');
+    }
 }
 
 $pageTitle = 'Profile';
@@ -178,6 +202,144 @@ $pageTitle = 'Profile';
             background: #e5e7eb;
         }
 
+        /* Subscription Section */
+        .subscription-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .subscription-card h2 {
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            color: #92400e;
+        }
+
+        .subscription-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .detail-value {
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .plan-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .plan-badge.free {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .plan-badge.pro {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .plan-badge.enterprise {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .status-badge.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.cancelled,
+        .status-badge.canceled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
         @media (max-width: 768px) {
             .main-container {
                 padding: 1rem;
@@ -220,7 +382,10 @@ $pageTitle = 'Profile';
     <main class="main-container">
         <div class="profile-header">
             <?php if ($user['avatar_url']): ?>
-                <img src="<?php echo escape($user['avatar_url']); ?>" alt="<?php echo escape($user['full_name']); ?>" class="profile-avatar">
+                <img src="<?php echo escape($user['avatar_url']); ?>" 
+                     alt="<?php echo escape($user['full_name']); ?>" 
+                     class="profile-avatar"
+                     referrerpolicy="no-referrer">
             <?php endif; ?>
             <div class="profile-name"><?php echo escape($user['full_name']); ?></div>
             <div class="profile-email"><?php echo escape($user['email']); ?></div>
@@ -266,6 +431,84 @@ $pageTitle = 'Profile';
             <a href="<?php echo url('/auth/logout.php'); ?>" class="action-button secondary">
                 🚪 Sign Out
             </a>
+        </div>
+
+        <!-- Current Subscription -->
+        <div class="subscription-card">
+            <h2>Current Subscription</h2>
+            
+            <?php if ($subscription && $subscription['cancel_at_period_end']): ?>
+                <div class="alert alert-warning">
+                    ⚠️ Your subscription is scheduled to cancel on <?php echo date('F j, Y', strtotime($subscription['current_period_end'])); ?>.
+                    You will retain access until then.
+                </div>
+            <?php endif; ?>
+
+            <div class="subscription-details">
+                <div class="detail-row">
+                    <span class="detail-label">Plan</span>
+                    <span class="plan-badge <?php echo $currentPlan; ?>">
+                        <?php echo ucfirst($currentPlan); ?>
+                    </span>
+                </div>
+
+                <?php if ($subscription): ?>
+                    <div class="detail-row">
+                        <span class="detail-label">Status</span>
+                        <span class="status-badge <?php echo $subscription['status']; ?>">
+                            <?php echo ucfirst($subscription['status']); ?>
+                        </span>
+                    </div>
+
+                    <?php if ($subscription['amount'] > 0): ?>
+                        <div class="detail-row">
+                            <span class="detail-label">Price</span>
+                            <span class="detail-value">
+                                $<?php echo number_format($subscription['amount'], 2); ?> / <?php echo $subscription['billing_cycle']; ?>
+                            </span>
+                        </div>
+
+                        <div class="detail-row">
+                            <span class="detail-label">Current Period</span>
+                            <span class="detail-value">
+                                <?php echo date('M j, Y', strtotime($subscription['current_period_start'])); ?> - 
+                                <?php echo date('M j, Y', strtotime($subscription['current_period_end'])); ?>
+                            </span>
+                        </div>
+
+                        <div class="detail-row">
+                            <span class="detail-label">Next Billing Date</span>
+                            <span class="detail-value">
+                                <?php echo $subscription['cancel_at_period_end'] ? 'N/A (Cancelled)' : date('F j, Y', strtotime($subscription['current_period_end'])); ?>
+                            </span>
+                        </div>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+
+            <div class="button-group">
+                <a href="<?php echo url('pricing.php'); ?>" class="btn btn-primary">
+                    View All Plans
+                </a>
+
+                <?php if ($subscription && $subscription['stripe_subscription_id']): ?>
+                    <?php if ($subscription['cancel_at_period_end']): ?>
+                        <form method="POST" style="display: inline;">
+                            <input type="hidden" name="action" value="reactivate">
+                            <button type="submit" class="btn btn-secondary">
+                                Reactivate Subscription
+                            </button>
+                        </form>
+                    <?php else: ?>
+                        <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel your subscription? You will retain access until the end of your billing period.');">
+                            <input type="hidden" name="action" value="cancel">
+                            <button type="submit" class="btn btn-danger">
+                                Cancel Subscription
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
         </div>
     </main>
 </body>

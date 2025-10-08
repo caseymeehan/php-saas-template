@@ -3,7 +3,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/Auth.php';
 
 // Configuration
-define('SITE_TAGLINE', 'Powerful SaaS Solution');
+define('SITE_TAGLINE', 'Production-Ready SaaS Template');
 
 // Check authentication
 $auth = new Auth();
@@ -16,7 +16,7 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Transform your business with our powerful SaaS solution. Join thousands of satisfied customers worldwide.">
+    <meta name="description" content="A complete PHP SaaS template with Google OAuth authentication and Stripe subscription payments. Production-ready code you can customize and launch today.">
     
     <title><?php echo SITE_NAME; ?> - <?php echo SITE_TAGLINE; ?></title>
     
@@ -44,9 +44,11 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
                 <div class="nav-menu" id="navMenu">
                     <?php if ($isLoggedIn): ?>
                         <a href="dashboard/" class="nav-item">📊 Dashboard</a>
+                        <a href="pricing.php" class="nav-item">💳 Pricing</a>
                         <a href="auth/logout.php" class="nav-item">🚪 Log out</a>
                     <?php else: ?>
                         <a href="#features" class="nav-item">✨ Features</a>
+                        <a href="pricing.php" class="nav-item">💳 Pricing</a>
                         <a href="auth/google-login.php" class="nav-item nav-item-cta">👋 Sign in with Google</a>
                     <?php endif; ?>
                 </div>
@@ -73,19 +75,22 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
                 <div class="hero-content">
                     <!-- Main Headline -->
                     <h1 class="hero-title">
-                        🚀 Transform Your Business
+                        🚀 SaaS Template Demo
                     </h1>
                     
                     <!-- Key Benefits as Bullet Points -->
                     <div class="benefits">
                         <div class="benefit">
-                            ✅ Take a screenshot of your workflow and let AI optimize it in seconds
+                            👋 This is a demo of the <strong>BZ SaaS Template</strong>
                         </div>
                         <div class="benefit">
-                            🎨 Choose a solution style from Modern, Minimalist to Enterprise
+                            ✅ <strong>Google OAuth Authentication</strong> - One-click sign-in ready to use
                         </div>
                         <div class="benefit">
-                            ⚡️ Transform your ideas and sketches into production-ready features
+                            💳 <strong>Stripe Subscription Payments</strong> - Complete billing system included
+                        </div>
+                        <div class="benefit">
+                            ⚡️ <strong>Production-Ready Code</strong> - Secure, tested, and fully documented
                         </div>
                     </div>
                 </div>
@@ -102,11 +107,11 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
                         </div>
                     <?php else: ?>
                         <div class="signup-bubble">
-                            ✨ Get your first results in less than a minute!
+                            ✨ Try the demo - Sign in with Google OAuth!
                         </div>
                         
                         <div class="signup-form">
-                            <a href="auth/google-login.php" class="btn btn-cta">Get started now →</a>
+                            <a href="auth/google-login.php" class="btn btn-cta">Try Demo Now →</a>
                             <a href="auth/google-login.php" class="btn btn-google">
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M17.64 9.20443C17.64 8.56625 17.5827 7.95262 17.4764 7.36353H9V10.8449H13.8436C13.635 11.9699 13.0009 12.9231 12.0477 13.5613V15.8194H14.9564C16.6582 14.2526 17.64 11.9453 17.64 9.20443Z" fill="#4285F4"/>
@@ -125,45 +130,45 @@ $user = $isLoggedIn ? $auth->getCurrentUser() : null;
     </section>
 
     <!-- Features Section -->
-    <section class="features-preview">
+    <section class="features-preview" id="features">
         <div class="container">
-            <h2 class="section-title">Why Choose <?php echo SITE_NAME; ?>?</h2>
+            <h2 class="section-title">What's Included in This Template</h2>
             
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Easy to Use</h3>
-                    <p>Intuitive interface designed for everyone, from beginners to experts.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🚄</div>
-                    <h3>Blazing Fast</h3>
-                    <p>Optimized performance ensures your work gets done quickly.</p>
-                </div>
-                
-                <div class="feature-card">
                     <div class="feature-icon">🔐</div>
-                    <h3>Secure & Reliable</h3>
-                    <p>Bank-level encryption keeps your data safe and secure.</p>
+                    <h3>Google OAuth Authentication</h3>
+                    <p>One-click sign-in with Google. Secure, database-backed sessions with automatic user creation.</p>
                 </div>
                 
                 <div class="feature-card">
-                    <div class="feature-icon">🌍</div>
-                    <h3>Global Reach</h3>
-                    <p>Serve customers worldwide with our global infrastructure.</p>
+                    <div class="feature-icon">💳</div>
+                    <h3>Stripe Subscriptions</h3>
+                    <p>Complete billing system with checkout, webhooks, and subscription management built-in.</p>
                 </div>
                 
                 <div class="feature-card">
-                    <div class="feature-icon">📈</div>
-                    <h3>Scalable</h3>
-                    <p>Grow from startup to enterprise without missing a beat.</p>
+                    <div class="feature-icon">🎯</div>
+                    <h3>Feature Gating</h3>
+                    <p>Plan-based limits (Free/Pro/Enterprise) with real-time usage tracking and upgrade prompts.</p>
                 </div>
                 
                 <div class="feature-card">
-                    <div class="feature-icon">💡</div>
-                    <h3>Smart Insights</h3>
-                    <p>AI-powered analytics help you make better decisions.</p>
+                    <div class="feature-icon">📊</div>
+                    <h3>Full Dashboard</h3>
+                    <p>User dashboard with CRUD operations, profile management, and usage widgets ready to customize.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Production Security</h3>
+                    <p>XSS protection, SQL injection prevention, CSRF tokens, and secure session management built-in.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Complete Documentation</h3>
+                    <p>Step-by-step setup guide, code comments, and examples to get you started quickly.</p>
                 </div>
             </div>
         </div>
