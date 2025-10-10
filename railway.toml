@@ -1,6 +1,9 @@
 [build]
 builder = "NIXPACKS"
 
+[build.nixpacks]
+version = "8.2"
+
 [deploy]
 startCommand = "php -S 0.0.0.0:${PORT:-8080}"
 

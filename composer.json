@@ -3,7 +3,7 @@
     "description": "A modern PHP SaaS template with Google OAuth and Stripe integration",
     "type": "project",
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.1",
         "google/apiclient": "^2.15",
         "stripe/stripe-php": "^13.0"
     },
