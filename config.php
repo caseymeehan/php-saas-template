@@ -11,7 +11,9 @@ define('DB_PATH', __DIR__ . '/database/saas.db');
 
 // Site configuration
 define('SITE_NAME', 'YourSaaS');
-define('SITE_URL', 'http://localhost:9000');
+// Auto-detect Railway URL or use localhost
+$railwayUrl = getenv('RAILWAY_PUBLIC_DOMAIN');
+define('SITE_URL', $railwayUrl ? 'https://' . $railwayUrl : 'http://localhost:9000');
 define('SITE_EMAIL', 'hello@yoursaas.com');
 
 // Load local configuration overrides (gitignored - for actual credentials)
@@ -84,13 +86,21 @@ define('PRICING_PLANS', [
 // Timezone
 date_default_timezone_set('UTC');
 
-// Error reporting (disable in production)
+// Detect production environment
+$isProduction = getenv('RAILWAY_ENVIRONMENT') !== false;
+
+// Error reporting (disable display in production)
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+if ($isProduction) {
+    ini_set('display_errors', '0');
+    ini_set('log_errors', '1');
+} else {
+    ini_set('display_errors', '1');
+}
 
 // Session configuration
 ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 0); // Set to 1 in production with HTTPS
+ini_set('session.cookie_secure', $isProduction ? 1 : 0);
 ini_set('session.use_strict_mode', 1);
 
 // Start session if not already started
